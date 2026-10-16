@@ -2,51 +2,54 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Stock Management</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <main class="dashboard">
-        <header>
-            <h1>Stock Management</h1>
-            <p class="subtitle">Running locally in your browser</p>
+        <header class="app-header">
+            <div>
+                <h1>Stock Manager</h1>
+                <p class="subtitle" id="inventory-counter">0 products tracked</p>
+            </div>
+            <button id="toggle-form-btn" class="icon-btn" aria-label="Add item">+</button>
         </header>
 
-        <!-- New section to add items -->
-        <section class="add-item-section">
+        <!-- Collapsible touch-friendly drawer -->
+        <section class="drawer hidden" id="add-drawer">
             <form id="add-form">
-                <input type="text" id="sku-input" placeholder="SKU (e.g. SKU-004)" required autocomplete="off">
-                <input type="text" id="name-input" placeholder="Product Name" required autocomplete="off">
-                <input type="number" id="stock-input" placeholder="Stock Quantity" required min="0">
-                <button type="submit">Add Product</button>
+                <h3>Add New Product</h3>
+                <div class="input-group">
+                    <input type="text" id="sku-input" placeholder="SKU code (e.g. SKU-104)" required autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <input type="text" id="name-input" placeholder="Product name" required autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <input type="number" id="stock-input" placeholder="Initial stock" required min="0" inputmode="numeric">
+                </div>
+                <button type="submit" class="primary-btn">Save Product</button>
             </form>
         </section>
 
-        <!-- Search and filter -->
+        <!-- Search and Filter bar -->
         <section class="controls">
-            <input type="text" id="search-input" placeholder="Search by SKU or name..." autocomplete="off">
-            <select id="stock-filter">
-                <option value="all">All Products</option>
-                <option value="available">In Stock (10+)</option>
-                <option value="low">Low Stock (< 10)</option>
-                <option value="out">Out of Stock (0)</option>
-            </select>
+            <div class="search-box">
+                <input type="search" id="search-input" placeholder="Search by SKU or name..." autocomplete="off">
+            </div>
+            <div class="filter-wrapper">
+                <select id="stock-filter">
+                    <option value="all">All Items</option>
+                    <option value="available">In Stock (10+)</option>
+                    <option value="low">Low Stock (< 10)</option>
+                    <option value="out">Out of Stock (0)</option>
+                </select>
+            </div>
         </section>
 
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>SKU</th>
-                        <th>Product Name</th>
-                        <th>Stock</th>
-                        <th>Manage</th>
-                    </tr>
-                </thead>
-                <tbody id="inventory-body"></tbody>
-            </table>
-        </div>
+        <!-- Inventory List (Replaced static table with dynamic cards) -->
+        <section class="inventory-list" id="inventory-list"></section>
     </main>
 
     <script src="script.js"></script>
