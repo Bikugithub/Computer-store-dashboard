@@ -1,4 +1,36 @@
-// 1. Industry Presets Dictionary
+// 1. Import Firebase directly from Google's servers
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+// 2. Your specific Firebase Configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAsbJE73N8WU1rVL5z3bIs-PcAgjdovO4g",
+  authDomain: "stock-management-3c94b.firebaseapp.com",
+  projectId: "stock-management-3c94b",
+  storageBucket: "stock-management-3c94b.firebasestorage.app",
+  messagingSenderId: "140096768670",
+  appId: "1:140096768670:web:044fb4d3bfad0861a2898f"
+};
+
+// 3. Initialize Firebase Services
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const provider = new GoogleAuthProvider();
+
+// DOM Elements
+const loginBtn = document.getElementById("login-btn");
+const logoutBtn = document.getElementById("logout-btn");
+const userStatus = document.getElementById("user-status");
+const appContent = document.getElementById("app-content");
+const tbody = document.querySelector("#inventory-body");
+const searchInput = document.querySelector("#search-input");
+const stockFilter = document.querySelector("#stock-filter");
+
+let inventoryData = [];
+
+// Industry Presets
 const templates = {
     tech: [
         { id: "SKU-001", name: "Lenovo ThinkPad", stock: 15 },
@@ -21,14 +53,80 @@ const templates = {
     ]
 };
 
-// 2. Load from localStorage, default to 'tech' if completely empty
-let inventoryData = JSON.parse(localStorage.getItem("warehouseData")) || templates.tech;
+// --- AUTHENTICATION LOGIC ---
 
-const tbody = document.querySelector("#inventory-body");
-const searchInput = document.querySelector("#search-input");
-const stockFilter = document.querySelector("#stock-filter");
+// Listen for Login/Logout state changes
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        // User is logged in
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "inline-block";
+        userStatus.textContent = `Logged in as: ${user.email}`;
+        appContent.style.display = "block";
+        
+        await loadDataFromCloud(user.uid);
+    } else {
+        // User is logged out
+        loginBtn.style.display = "inline-block";
+        logoutBtn.style.display = "none";
+        userStatus.textContent = "Please log in to sync data to the cloud.";
+        appContent.style.display = "none";
+        inventoryData = [];
+    }
+});
 
-// 3. Render Function
+// Login Button Click
+loginBtn.addEventListener("click", () => {
+    signInWithPopup(auth, provider).catch(error => alert("Login failed: " + error.message));
+});
+
+// Logout Button Click
+logoutBtn.addEventListener("click", () => {
+    signOut(auth);
+});
+
+// --- CLOUD DATABASE LOGIC ---
+
+// Fetch data from Firestore
+async function loadDataFromCloud(userId) {
+    userStatus.textContent = "Loading data from cloud...";
+    try {
+        const docRef = doc(db, "users", userId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            inventoryData = docSnap.data().inventory;
+        } else {
+            inventoryData = templates.tech; // Default if they are a brand new user
+            await saveDataToCloud(); // Save the default immediately
+        }
+        renderTable();
+        userStatus.textContent = `Cloud sync active for: ${auth.currentUser.email}`;
+    } catch (error) {
+        console.error("Error loading data:", error);
+        userStatus.textContent = "Error loading data. Check console.";
+    }
+}
+
+// Push data to Firestore
+async function saveDataToCloud() {
+    if (!auth.currentUser) return; // Don't save if not logged in
+    
+    userStatus.textContent = "Syncing...";
+    try {
+        const docRef = doc(db, "users", auth.currentUser.uid);
+        // This pushes the current array to Google's servers
+        await setDoc(docRef, { inventory: inventoryData }); 
+        userStatus.textContent = `Cloud sync active for: ${auth.currentUser.email}`;
+    } catch (error) {
+        console.error("Error saving data:", error);
+        userStatus.textContent = "Error saving to cloud!";
+    }
+}
+
+
+// --- UI RENDERING & LOGIC ---
+
 function renderTable() {
     tbody.innerHTML = "";
     const query = searchInput.value.trim().toLowerCase();
@@ -64,77 +162,75 @@ function renderTable() {
         `;
         tbody.appendChild(tr);
     });
-
-    localStorage.setItem("warehouseData", JSON.stringify(inventoryData));
 }
 
-// 4. Handle Clicks inside the Table (Plus, Minus, and Delete)
-tbody.addEventListener("click", function(e) {
+// Handle Clicks inside the Table
+tbody.addEventListener("click", async function(e) {
     const targetId = e.target.dataset.id;
     if (!targetId) return;
 
-    // Delete Button Logic
     if (e.target.classList.contains("btn-delete")) {
-        // Filter out the item that matches the ID we want to delete
         inventoryData = inventoryData.filter(item => item.id !== targetId);
         renderTable();
+        await saveDataToCloud();
         return;
     }
 
-    // Plus/Minus Logic
     const targetItem = inventoryData.find(item => item.id === targetId);
     if (e.target.classList.contains("btn-plus")) {
         targetItem.stock++;
         renderTable();
+        await saveDataToCloud();
     }
+    
     if (e.target.classList.contains("btn-minus") && targetItem.stock > 0) {
         targetItem.stock--;
         renderTable();
+        await saveDataToCloud();
     }
 });
 
-// 5. Add New Item Logic
-document.querySelector("#add-btn").addEventListener("click", () => {
+// Add New Item
+document.querySelector("#add-btn").addEventListener("click", async () => {
     const sku = document.querySelector("#new-sku").value.trim();
     const name = document.querySelector("#new-name").value.trim();
     const stock = parseInt(document.querySelector("#new-stock").value);
 
-    // Form validation
     if (sku === "" || name === "" || isNaN(stock) || stock < 0) {
         alert("Please enter a valid SKU, Name, and Stock quantity.");
         return;
     }
 
-    // Push the new item into the JavaScript array
     inventoryData.push({ id: sku, name: name, stock: stock });
     
-    // Clear inputs
     document.querySelector("#new-sku").value = "";
     document.querySelector("#new-name").value = "";
     document.querySelector("#new-stock").value = "";
     
     renderTable();
+    await saveDataToCloud();
 });
 
-// 6. Template Loader Logic
-document.querySelector("#load-template-btn").addEventListener("click", () => {
-    if(confirm("This will wipe your current inventory and load the selected preset. Continue?")) {
+// Load Template
+document.querySelector("#load-template-btn").addEventListener("click", async () => {
+    if(confirm("This will wipe your current inventory and load the preset to the cloud. Continue?")) {
         const selected = document.querySelector("#profession-template").value;
-        // JSON stringify/parse ensures we make a deep copy of the template, not a direct link
         inventoryData = JSON.parse(JSON.stringify(templates[selected]));
         renderTable();
+        await saveDataToCloud();
     }
 });
 
-// 7. Search & Clear Data Listeners
+// Search and Filter Listeners
 searchInput.addEventListener("input", renderTable);
 stockFilter.addEventListener("change", renderTable);
 
-document.querySelector("#reset-btn").addEventListener("click", () => {
-    if(confirm("Are you sure you want to completely clear all data?")) {
+// Reset Button
+document.querySelector("#reset-btn").addEventListener("click", async () => {
+    if(confirm("Are you sure you want to completely clear all data from the cloud?")) {
         inventoryData = [];
         renderTable();
+        await saveDataToCloud();
     }
 });
-
-renderTable();
+    
