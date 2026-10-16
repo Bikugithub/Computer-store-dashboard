@@ -12,31 +12,15 @@
         <header>
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <h1>Stock Management</h1>
-                <button id="login-btn" class="primary-btn">Login with Google</button>
-                <button id="logout-btn" class="secondary-btn" style="display: none;">Logout</button>
+                <!-- Notice the Google login buttons are completely gone -->
             </div>
-            <p class="subtitle" id="user-status">Please log in to sync data to the cloud.</p>
+            <!-- This will now show your live server connection status -->
+            <p class="subtitle" id="user-status">Connecting to Replit server...</p>
         </header>
 
-        <!-- This entire section is hidden until the user logs in -->
-        <div id="app-content" style="display: none;">
-            <section class="template-loader">
-                <select id="profession-template">
-                    <option value="tech">Tech & Office</option>
-                    <option value="lab">Chemistry Lab</option>
-                    <option value="pharmacy">Pharmacy</option>
-                    <option value="restaurant">Restaurant</option>
-                </select>
-                <button id="load-template-btn" class="secondary-btn">Load Template</button>
-            </section>
-
-            <section class="add-item-form">
-                <input type="text" id="new-sku" placeholder="SKU (e.g. LAB-01)" autocomplete="off">
-                <input type="text" id="new-name" placeholder="Product Name" autocomplete="off">
-                <input type="number" id="new-stock" placeholder="Qty" min="0">
-                <button id="add-btn" class="primary-btn">Add Item</button>
-            </section>
-
+        <!-- display is now set to "block" so it shows up right away -->
+        <div id="app-content" style="display: block;">
+            
             <section class="controls">
                 <input type="text" id="search-input" placeholder="Search by SKU or name..." autocomplete="off">
                 <select id="stock-filter">
@@ -61,12 +45,10 @@
                 </table>
             </div>
             
-            <button id="reset-btn" class="danger-btn">Wipe All Data</button>
         </div>
     </main>
 
-    <!-- The type="module" is critical for Firebase to work -->
-    <script type="module" src="script.js"></script>
+    <!-- Removed type="module" because we are using standard fetch now -->
+    <script src="script.js"></script>
 </body>
-    </html>
-    
+</html>
