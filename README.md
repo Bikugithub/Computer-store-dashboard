@@ -1,2 +1,4 @@
 # Computer-store-dashboard
 This is an efficient tracker tool and it helps
+
+FOR PREVIEW = https://bikugithub.github.io/Computer-store-dashboard/
