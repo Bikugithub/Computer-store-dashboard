@@ -3,52 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cloud Warehouse Inventory</title>
+    <title>Stock Management</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <main class="dashboard">
         <header>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h1>Stock Management</h1>
-                <!-- Notice the Google login buttons are completely gone -->
-            </div>
-            <!-- This will now show your live server connection status -->
-            <p class="subtitle" id="user-status">Connecting to Replit server...</p>
+            <h1>Stock Management</h1>
+            <p class="subtitle">Running locally in your browser</p>
         </header>
 
-        <!-- display is now set to "block" so it shows up right away -->
-        <div id="app-content" style="display: block;">
-            
-            <section class="controls">
-                <input type="text" id="search-input" placeholder="Search by SKU or name..." autocomplete="off">
-                <select id="stock-filter">
-                    <option value="all">All Products</option>
-                    <option value="available">In Stock (10+)</option>
-                    <option value="low">Low Stock (< 10)</option>
-                    <option value="out">Out of Stock (0)</option>
-                </select>
-            </section>
+        <!-- New section to add items -->
+        <section class="add-item-section">
+            <form id="add-form">
+                <input type="text" id="sku-input" placeholder="SKU (e.g. SKU-004)" required autocomplete="off">
+                <input type="text" id="name-input" placeholder="Product Name" required autocomplete="off">
+                <input type="number" id="stock-input" placeholder="Stock Quantity" required min="0">
+                <button type="submit">Add Product</button>
+            </form>
+        </section>
 
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>SKU</th>
-                            <th>Product Name</th>
-                            <th>Stock</th>
-                            <th>Manage</th>
-                        </tr>
-                    </thead>
-                    <tbody id="inventory-body"></tbody>
-                </table>
-            </div>
-            
+        <!-- Search and filter -->
+        <section class="controls">
+            <input type="text" id="search-input" placeholder="Search by SKU or name..." autocomplete="off">
+            <select id="stock-filter">
+                <option value="all">All Products</option>
+                <option value="available">In Stock (10+)</option>
+                <option value="low">Low Stock (< 10)</option>
+                <option value="out">Out of Stock (0)</option>
+            </select>
+        </section>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>SKU</th>
+                        <th>Product Name</th>
+                        <th>Stock</th>
+                        <th>Manage</th>
+                    </tr>
+                </thead>
+                <tbody id="inventory-body"></tbody>
+            </table>
         </div>
     </main>
 
-    <!-- Removed type="module" because we are using standard fetch now -->
     <script src="script.js"></script>
 </body>
 </html>
