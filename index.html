@@ -3,64 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Warehouse Inventory</title>
+    <title>Cloud Warehouse Inventory</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <main class="dashboard">
         <header>
-            <h1>Stock Management</h1>
-            <p class="subtitle">Live local warehouse data</p>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1>Stock Management</h1>
+                <button id="login-btn" class="primary-btn">Login with Google</button>
+                <button id="logout-btn" class="secondary-btn" style="display: none;">Logout</button>
+            </div>
+            <p class="subtitle" id="user-status">Please log in to sync data to the cloud.</p>
         </header>
 
-        <!-- 1. Industry Template Loader -->
-        <section class="template-loader">
-            <select id="profession-template">
-                <option value="tech">Tech & Office</option>
-                <option value="lab">Chemistry Lab</option>
-                <option value="pharmacy">Pharmacy</option>
-                <option value="restaurant">Restaurant</option>
-            </select>
-            <button id="load-template-btn" class="secondary-btn">Load Template</button>
-        </section>
+        <!-- This entire section is hidden until the user logs in -->
+        <div id="app-content" style="display: none;">
+            <section class="template-loader">
+                <select id="profession-template">
+                    <option value="tech">Tech & Office</option>
+                    <option value="lab">Chemistry Lab</option>
+                    <option value="pharmacy">Pharmacy</option>
+                    <option value="restaurant">Restaurant</option>
+                </select>
+                <button id="load-template-btn" class="secondary-btn">Load Template</button>
+            </section>
 
-        <!-- 2. Add New Product Form -->
-        <section class="add-item-form">
-            <input type="text" id="new-sku" placeholder="SKU (e.g. LAB-01)" autocomplete="off">
-            <input type="text" id="new-name" placeholder="Product Name" autocomplete="off">
-            <input type="number" id="new-stock" placeholder="Qty" min="0">
-            <button id="add-btn" class="primary-btn">Add Item</button>
-        </section>
+            <section class="add-item-form">
+                <input type="text" id="new-sku" placeholder="SKU (e.g. LAB-01)" autocomplete="off">
+                <input type="text" id="new-name" placeholder="Product Name" autocomplete="off">
+                <input type="number" id="new-stock" placeholder="Qty" min="0">
+                <button id="add-btn" class="primary-btn">Add Item</button>
+            </section>
 
-        <section class="controls">
-            <input type="text" id="search-input" placeholder="Search by SKU or name..." autocomplete="off">
-            <select id="stock-filter">
-                <option value="all">All Products</option>
-                <option value="available">In Stock (10+)</option>
-                <option value="low">Low Stock (< 10)</option>
-                <option value="out">Out of Stock (0)</option>
-            </select>
-        </section>
+            <section class="controls">
+                <input type="text" id="search-input" placeholder="Search by SKU or name..." autocomplete="off">
+                <select id="stock-filter">
+                    <option value="all">All Products</option>
+                    <option value="available">In Stock (10+)</option>
+                    <option value="low">Low Stock (< 10)</option>
+                    <option value="out">Out of Stock (0)</option>
+                </select>
+            </section>
 
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>SKU</th>
-                        <th>Product Name</th>
-                        <th>Stock</th>
-                        <th>Manage</th>
-                    </tr>
-                </thead>
-                <tbody id="inventory-body"></tbody>
-            </table>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>SKU</th>
+                            <th>Product Name</th>
+                            <th>Stock</th>
+                            <th>Manage</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventory-body"></tbody>
+                </table>
+            </div>
+            
+            <button id="reset-btn" class="danger-btn">Wipe All Data</button>
         </div>
-        
-        <button id="reset-btn" class="danger-btn">Wipe All Data</button>
     </main>
 
-    <script src="script.js"></script>
+    <!-- The type="module" is critical for Firebase to work -->
+    <script type="module" src="script.js"></script>
 </body>
     </html>
     
