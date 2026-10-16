@@ -141,3 +141,85 @@ th {
 .danger-btn:hover {
     background: #fef2f2;
 }
+
+/* Template Loader & Add Item Form */
+.template-loader {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px dashed #cbd5e1;
+}
+
+.template-loader select {
+    padding: 8px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    outline: none;
+}
+
+.secondary-btn {
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #475569;
+}
+
+.add-item-form {
+    display: grid;
+    grid-template-columns: 1fr 2fr 80px auto;
+    gap: 10px;
+    margin-bottom: 25px;
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.add-item-form input {
+    padding: 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    outline: none;
+}
+
+.primary-btn {
+    background: #0284c7;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.primary-btn:hover { background: #0369a1; }
+
+.btn-delete {
+    background: #fee2e2;
+    color: #ef4444;
+    border: none;
+    border-radius: 4px;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: background 0.2s;
+}
+
+.btn-delete:hover { background: #fca5a5; }
+
+/* Make the Add Form stack perfectly on mobile screens */
+@media (max-width: 650px) {
+    .add-item-form {
+        grid-template-columns: 1fr 1fr;
+    }
+    .add-item-form #new-name, 
+    .add-item-form .primary-btn {
+        grid-column: span 2;
+    }
+}
+
