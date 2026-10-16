@@ -1,132 +1,35 @@
-// 1. Import Firebase directly from Google's servers
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+// The live URL of your Replit Node.js backend
+const API_URL = "https://3571c3fc-d97a-46b1-8d26-4cc9cbfbf2ec-00-2qf3a8vd042dk.pike.replit.dev/api/inventory";
 
-// 2. Your specific Firebase Configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyAsbJE73N8WU1rVL5z3bIs-PcAgjdovO4g",
-  authDomain: "stock-management-3c94b.firebaseapp.com",
-  projectId: "stock-management-3c94b",
-  storageBucket: "stock-management-3c94b.firebasestorage.app",
-  messagingSenderId: "140096768670",
-  appId: "1:140096768670:web:044fb4d3bfad0861a2898f"
-};
-
-// 3. Initialize Firebase Services
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const provider = new GoogleAuthProvider();
-
-// DOM Elements
-const loginBtn = document.getElementById("login-btn");
-const logoutBtn = document.getElementById("logout-btn");
-const userStatus = document.getElementById("user-status");
-const appContent = document.getElementById("app-content");
 const tbody = document.querySelector("#inventory-body");
 const searchInput = document.querySelector("#search-input");
 const stockFilter = document.querySelector("#stock-filter");
+const userStatus = document.getElementById("user-status"); // Reusing the subtitle for status
 
 let inventoryData = [];
 
-// Industry Presets
-const templates = {
-    tech: [
-        { id: "SKU-001", name: "Lenovo ThinkPad", stock: 15 },
-        { id: "SKU-002", name: "Wireless Mouse", stock: 8 }
-    ],
-    lab: [
-        { id: "CHEM-01", name: "Sulfuric Acid (500ml)", stock: 8 },
-        { id: "CHEM-02", name: "Glass Beakers (250ml)", stock: 45 },
-        { id: "CHEM-03", name: "Litmus Paper Strips", stock: 120 }
-    ],
-    pharmacy: [
-        { id: "MED-01", name: "Paracetamol 500mg", stock: 350 },
-        { id: "MED-02", name: "Cough Syrup (100ml)", stock: 5 },
-        { id: "MED-03", name: "Surgical Masks (Box)", stock: 0 }
-    ],
-    restaurant: [
-        { id: "FOOD-01", name: "All-Purpose Flour (kg)", stock: 25 },
-        { id: "FOOD-02", name: "Olive Oil (Liters)", stock: 4 },
-        { id: "FOOD-03", name: "Tomato Paste (Cans)", stock: 60 }
-    ]
-};
-
-// --- AUTHENTICATION LOGIC ---
-
-// Listen for Login/Logout state changes
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        // User is logged in
-        loginBtn.style.display = "none";
-        logoutBtn.style.display = "inline-block";
-        userStatus.textContent = `Logged in as: ${user.email}`;
-        appContent.style.display = "block";
+// 1. Fetch data from your custom backend API
+async function fetchInventory() {
+    userStatus.textContent = "Connecting to Replit server...";
+    try {
+        const response = await fetch(API_URL);
         
-        await loadDataFromCloud(user.uid);
-    } else {
-        // User is logged out
-        loginBtn.style.display = "inline-block";
-        logoutBtn.style.display = "none";
-        userStatus.textContent = "Please log in to sync data to the cloud.";
-        appContent.style.display = "none";
-        inventoryData = [];
-    }
-});
-
-// Login Button Click
-loginBtn.addEventListener("click", () => {
-    signInWithPopup(auth, provider).catch(error => alert("Login failed: " + error.message));
-});
-
-// Logout Button Click
-logoutBtn.addEventListener("click", () => {
-    signOut(auth);
-});
-
-// --- CLOUD DATABASE LOGIC ---
-
-// Fetch data from Firestore
-async function loadDataFromCloud(userId) {
-    userStatus.textContent = "Loading data from cloud...";
-    try {
-        const docRef = doc(db, "users", userId);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-            inventoryData = docSnap.data().inventory;
-        } else {
-            inventoryData = templates.tech; // Default if they are a brand new user
-            await saveDataToCloud(); // Save the default immediately
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
+        // Convert the JSON response into a JavaScript array
+        inventoryData = await response.json();
+        
+        userStatus.textContent = "Live data loaded from custom Node.js backend!";
         renderTable();
-        userStatus.textContent = `Cloud sync active for: ${auth.currentUser.email}`;
     } catch (error) {
-        console.error("Error loading data:", error);
-        userStatus.textContent = "Error loading data. Check console.";
+        console.error("Error fetching from API:", error);
+        userStatus.textContent = "Failed to connect to the server. Check console.";
     }
 }
 
-// Push data to Firestore
-async function saveDataToCloud() {
-    if (!auth.currentUser) return; // Don't save if not logged in
-    
-    userStatus.textContent = "Syncing...";
-    try {
-        const docRef = doc(db, "users", auth.currentUser.uid);
-        // This pushes the current array to Google's servers
-        await setDoc(docRef, { inventory: inventoryData }); 
-        userStatus.textContent = `Cloud sync active for: ${auth.currentUser.email}`;
-    } catch (error) {
-        console.error("Error saving data:", error);
-        userStatus.textContent = "Error saving to cloud!";
-    }
-}
-
-
-// --- UI RENDERING & LOGIC ---
-
+// 2. Render the table
 function renderTable() {
     tbody.innerHTML = "";
     const query = searchInput.value.trim().toLowerCase();
@@ -155,82 +58,16 @@ function renderTable() {
             <td>${item.name}</td>
             <td class="${stockClass}">${item.stock}</td>
             <td>
-                <button class="btn-minus" data-id="${item.id}">-</button>
-                <button class="btn-plus" data-id="${item.id}">+</button>
-                <button class="btn-delete" data-id="${item.id}" title="Delete Item">🗑️</button>
+                <span style="color: #666; font-size: 0.8rem;">(Read Only)</span>
             </td>
         `;
         tbody.appendChild(tr);
     });
 }
 
-// Handle Clicks inside the Table
-tbody.addEventListener("click", async function(e) {
-    const targetId = e.target.dataset.id;
-    if (!targetId) return;
-
-    if (e.target.classList.contains("btn-delete")) {
-        inventoryData = inventoryData.filter(item => item.id !== targetId);
-        renderTable();
-        await saveDataToCloud();
-        return;
-    }
-
-    const targetItem = inventoryData.find(item => item.id === targetId);
-    if (e.target.classList.contains("btn-plus")) {
-        targetItem.stock++;
-        renderTable();
-        await saveDataToCloud();
-    }
-    
-    if (e.target.classList.contains("btn-minus") && targetItem.stock > 0) {
-        targetItem.stock--;
-        renderTable();
-        await saveDataToCloud();
-    }
-});
-
-// Add New Item
-document.querySelector("#add-btn").addEventListener("click", async () => {
-    const sku = document.querySelector("#new-sku").value.trim();
-    const name = document.querySelector("#new-name").value.trim();
-    const stock = parseInt(document.querySelector("#new-stock").value);
-
-    if (sku === "" || name === "" || isNaN(stock) || stock < 0) {
-        alert("Please enter a valid SKU, Name, and Stock quantity.");
-        return;
-    }
-
-    inventoryData.push({ id: sku, name: name, stock: stock });
-    
-    document.querySelector("#new-sku").value = "";
-    document.querySelector("#new-name").value = "";
-    document.querySelector("#new-stock").value = "";
-    
-    renderTable();
-    await saveDataToCloud();
-});
-
-// Load Template
-document.querySelector("#load-template-btn").addEventListener("click", async () => {
-    if(confirm("This will wipe your current inventory and load the preset to the cloud. Continue?")) {
-        const selected = document.querySelector("#profession-template").value;
-        inventoryData = JSON.parse(JSON.stringify(templates[selected]));
-        renderTable();
-        await saveDataToCloud();
-    }
-});
-
 // Search and Filter Listeners
 searchInput.addEventListener("input", renderTable);
 stockFilter.addEventListener("change", renderTable);
 
-// Reset Button
-document.querySelector("#reset-btn").addEventListener("click", async () => {
-    if(confirm("Are you sure you want to completely clear all data from the cloud?")) {
-        inventoryData = [];
-        renderTable();
-        await saveDataToCloud();
-    }
-});
-    
+// Load data immediately when the app starts
+fetchInventory();
