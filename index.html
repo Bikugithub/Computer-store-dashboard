@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warehouse Inventory</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <main class="dashboard">
+        <header>
+            <h1>Stock Management</h1>
+            <p class="subtitle">Live local warehouse data</p>
+        </header>
+
+        <!-- New: Search and Filter Controls -->
+        <section class="controls">
+            <input 
+                type="text" 
+                id="search-input" 
+                placeholder="Search by SKU or product name..." 
+                autocomplete="off"
+            >
+            <select id="stock-filter">
+                <option value="all">All Products</option>
+                <option value="available">In Stock (10+)</option>
+                <option value="low">Low Stock (< 10)</option>
+                <option value="out">Out of Stock (0)</option>
+            </select>
+        </section>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>SKU</th>
+                        <th>Product Name</th>
+                        <th>Stock</th>
+                        <th>Update</th>
+                    </tr>
+                </thead>
+                <tbody id="inventory-body"></tbody>
+            </table>
+        </div>
+        
+        <button id="reset-btn" class="danger-btn">Factory Reset Data</button>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

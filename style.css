@@ -1,0 +1,143 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f1f5f9;
+    color: #334155;
+    padding: 20px;
+}
+
+.dashboard {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+header {
+    margin-bottom: 20px;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 15px;
+}
+
+h1 {
+    font-size: 1.8rem;
+    color: #0f172a;
+}
+
+.subtitle {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+/* Controls: Search & Filter */
+.controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.controls input, 
+.controls select {
+    padding: 10px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    outline: none;
+    background: #ffffff;
+    color: #334155;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.controls input {
+    flex: 1;
+    min-width: 220px;
+}
+
+.controls select {
+    min-width: 160px;
+    cursor: pointer;
+}
+
+.controls input:focus, 
+.controls select:focus {
+    border-color: #0284c7;
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+th, td {
+    padding: 14px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+th {
+    background-color: #f8fafc;
+    font-weight: 600;
+    color: #475569;
+}
+
+.low-stock {
+    color: #ef4444;
+    font-weight: 700;
+}
+
+.out-of-stock {
+    color: #94a3b8;
+    font-weight: 700;
+    text-decoration: line-through;
+}
+
+.no-results {
+    text-align: center;
+    color: #94a3b8;
+    padding: 24px 0;
+    font-style: italic;
+}
+
+/* Action Buttons */
+.btn-plus, .btn-minus {
+    background: #e2e8f0;
+    border: none;
+    border-radius: 4px;
+    width: 32px;
+    height: 32px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-plus:hover { background: #cbd5e1; }
+.btn-minus:hover { background: #cbd5e1; }
+
+.danger-btn {
+    margin-top: 25px;
+    background: transparent;
+    color: #ef4444;
+    border: 1px solid #ef4444;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.danger-btn:hover {
+    background: #fef2f2;
+}
